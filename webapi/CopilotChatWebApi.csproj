@@ -92,6 +92,12 @@
     </Content>
     -->
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="data\*.traineddata">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\" />

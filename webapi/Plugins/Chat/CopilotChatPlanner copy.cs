@@ -98,12 +98,11 @@ public class CopilotChatPlanner
         {
             switch (this._plannerOptions?.Type)
             {
-                case "Sequential": // Changed from PlanType.Sequential to "Sequential"
+                case PlanType.Sequential:
                     plan = await new SequentialPlanner(
                         this.Kernel,
                         new SequentialPlannerConfig
                         {
-                            RelevancyThreshold = 0.75, // Set RelevancyThreshold to 0.75
                             SemanticMemoryConfig =
                             {
                                 RelevancyThreshold = this._plannerOptions?.RelevancyThreshold,
@@ -124,7 +123,6 @@ public class CopilotChatPlanner
             return new Plan(goal);
         }
 
-        // Sanitize the plan if AllowMissingFunctions is true
         return this._plannerOptions!.ErrorHandling.AllowMissingFunctions ? this.SanitizePlan(plan, plannerFunctionsView, logger) : plan;
     }
 
