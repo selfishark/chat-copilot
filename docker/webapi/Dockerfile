@@ -12,6 +12,7 @@ RUN cd webapi && \
   dotnet restore --use-current-runtime && \
   apt update && apt install -y wget && \
   wget -P data https://raw.githubusercontent.com/tesseract-ocr/tessdata/main/eng.traineddata && \
+  wget -P /app/data https://raw.githubusercontent.com/tesseract-ocr/tessdata/main/fra.traineddata \
   dotnet publish --use-current-runtime --self-contained false --no-restore -o /app
 
 # final stage/image
