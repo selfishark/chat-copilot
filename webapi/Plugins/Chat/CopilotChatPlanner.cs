@@ -16,7 +16,7 @@ using Microsoft.SemanticKernel.Diagnostics;
 using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.Planners;
 using Microsoft.SemanticKernel.Planning;
-using Microsoft.SemanticKernel.Planning.Sequential;
+// using Microsoft.SemanticKernel.Planning.SequentialPlanner;
 
 namespace CopilotChat.WebApi.Plugins.Chat;
 
@@ -92,30 +92,18 @@ public class CopilotChatPlanner
             return new Plan(goal);
         }
 
-        Plan plan;
-
         try
         {
-            switch (this._plannerOptions?.Type)
+            if (this._plannerOptions?.Type == "Sequential")
             {
-                case "Sequential": // Changed from PlanType.Sequential to "Sequential"
-                    plan = await new SequentialPlanner(
-                        this.Kernel,
-                        new SequentialPlannerConfig
-                        {
-                            RelevancyThreshold = 0.75, // Set RelevancyThreshold to 0.75
-                            SemanticMemoryConfig =
-                            {
-                                RelevancyThreshold = this._plannerOptions?.RelevancyThreshold,
-                            },
-                            // Allow plan to be created with missing functions
-                            AllowMissingFunctions = this._plannerOptions?.ErrorHandling.AllowMissingFunctions ?? false
-                        }
-                    ).CreatePlanAsync(goal, cancellationToken);
-                    break;
-                default:
-                    plan = await new ActionPlanner(this.Kernel).CreatePlanAsync(goal, cancellationToken);
-                    break;
+                return await new SequentialPlanner(
+                    this.Kernel,
+                    new SequentialPlannerConfig { RelevancyThreshold = 0.75 }
+                ).CreatePlanAsync(goal, cancellationToken);
+            }
+            else
+            {
+                return await new ActionPlanner(this.Kernel).CreatePlanAsync(goal, cancellationToken);
             }
         }
         catch (SKException)
@@ -124,8 +112,8 @@ public class CopilotChatPlanner
             return new Plan(goal);
         }
 
-        // Sanitize the plan if AllowMissingFunctions is true
         return this._plannerOptions!.ErrorHandling.AllowMissingFunctions ? this.SanitizePlan(plan, plannerFunctionsView, logger) : plan;
+
     }
 
     /// <summary>

@@ -13,8 +13,8 @@ RUN cd memorypipeline && \
   apt update && apt install -y wget && \
   dotnet publish --use-current-runtime --self-contained false --no-restore -o /app && \
   mkdir /app/data && \
-  wget -P /app/data https://raw.githubusercontent.com/tesseract-ocr/tessdata/main/eng.traineddata && \
-  wget -P /app/data https://raw.githubusercontent.com/tesseract-ocr/tessdata/main/fra.traineddata
+  wget -P /app/data https://github.com/tesseract-ocr/tessdata_best/raw/main/eng.traineddata && \
+  wget -P /app/data https://github.com/tesseract-ocr/tessdata_best/raw/main/fra.traineddata
 
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
@@ -22,7 +22,7 @@ WORKDIR /app
 COPY --from=builder /app .
 COPY --from=builder /root/.dotnet/corefx/cryptography/x509stores/my/* /root/.dotnet/corefx/cryptography/x509stores/my/
 RUN apt-get update --fix-missing && \
-  apt-get install -y libleptonica-dev libtesseract-dev libc6-dev libjpeg62-turbo-dev libgdiplus && \
+  apt-get install -y libleptonica-dev libtesseract-dev libc6-dev libjpeg62-turbo-dev libgdiplus wget && \
   ln -s /usr/lib/x86_64-linux-gnu/liblept.so.5 x64/libleptonica-1.82.0.so && \
   ln -s /usr/lib/x86_64-linux-gnu/libtesseract.so.4.0.1 x64/libtesseract50.so
 ENTRYPOINT ["./CopilotChatMemoryPipeline"]
